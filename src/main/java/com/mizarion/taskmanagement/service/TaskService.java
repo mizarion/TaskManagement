@@ -12,12 +12,12 @@ public interface TaskService {
 
     List<TaskDto> getTasksByCreator(String creator);
 
-    List<TaskDto> getTasksByAssigned(String creator);
+    List<TaskDto> getTasksByAssigned(String assigned);
 
-    TaskDto createTask(TaskDto task, String creator);
+    TaskDto createTask(TaskDto task);
 
-    TaskDto updateTask(TaskDto task, Long taskID, String creator);
+    TaskDto updateTask(TaskDto task);
 
-    void deleteTask(TaskDto task, String creator);
+    void deleteTask(Long id, String creator);
 
 }
