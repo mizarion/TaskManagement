@@ -10,7 +10,9 @@ import java.util.List;
 public interface UserService {
 
     UserDto register(RegisterRequest registerRequest);
+
     UserDto findByEmail(String email);
+
     String authenticate(AuthRequest authRequest);
 
     List<UserDto> getAllUsers();

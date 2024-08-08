@@ -1,15 +1,22 @@
 package com.mizarion.taskmanagement.repository;
 
 import com.mizarion.taskmanagement.entity.TaskEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
+public interface TaskRepository extends JpaRepository<TaskEntity, Long>, JpaSpecificationExecutor<TaskEntity> {
 
-    List<TaskEntity> getTaskEntitiesByCreator(String creator);
+    @Query("SELECT t FROM TaskEntity t " +
+           "WHERE (:creator IS NULL OR t.creator = :creator) " +
+           "AND (:assigned IS NULL OR t.assigned = :assigned)")
+    Page<TaskEntity> findByCreatorAndAssigned(@Param("creator") String creator,
+                                              @Param("assigned") String assigned,
+                                              Pageable pageable);
 
-    List<TaskEntity> getTaskEntitiesByAssigned(String assigned);
 }

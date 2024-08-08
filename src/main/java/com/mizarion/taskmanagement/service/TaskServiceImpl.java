@@ -5,6 +5,7 @@ import com.mizarion.taskmanagement.entity.TaskEntity;
 import com.mizarion.taskmanagement.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,20 +27,6 @@ public class TaskServiceImpl implements TaskService {
     public List<TaskDto> getAllTasks() {
         return taskRepository.findAll().stream()
                 .map(e -> modelMapper.map(e, TaskDto.class))
-                .toList();
-    }
-
-    @Override
-    public List<TaskDto> getTasksByCreator(String creator) {
-        return taskRepository.getTaskEntitiesByCreator(creator)
-                .stream().map(e -> modelMapper.map(e, TaskDto.class))
-                .toList();
-    }
-
-    @Override
-    public List<TaskDto> getTasksByAssigned(String assigned) {
-        return taskRepository.getTaskEntitiesByAssigned(assigned)
-                .stream().map(e -> modelMapper.map(e, TaskDto.class))
                 .toList();
     }
 
@@ -75,5 +62,12 @@ public class TaskServiceImpl implements TaskService {
         }
 
         taskRepository.delete(existingTask);
+    }
+
+    @Override
+    public List<TaskDto> getAllTasks(String creator, String assigned, Pageable pageable) {
+        return taskRepository.findByCreatorAndAssigned(creator,assigned, pageable).stream()
+                .map(e -> modelMapper.map(e, TaskDto.class))
+                .toList();
     }
 }

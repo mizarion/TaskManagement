@@ -32,8 +32,10 @@ public class TaskEntity {
     @Enumerated(EnumType.STRING)
     private TaskPriority priority;
 
+    @Column(name = "creator")
     private String creator;
 
+    @Column(name = "assigned")
     private String assigned;
 
 }

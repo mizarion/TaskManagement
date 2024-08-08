@@ -6,10 +6,10 @@ import com.mizarion.taskmanagement.dto.TaskDto;
 import com.mizarion.taskmanagement.entity.UserEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
@@ -21,18 +21,17 @@ class TaskServiceTest {
     @Autowired
     private TaskService taskService;
 
-
-    UserEntity creator = UserEntity.builder()
+    private final UserEntity creator = UserEntity.builder()
             .id(1L)
             .email("creator@example.com")
             .build();
 
-    UserEntity assigned = UserEntity.builder()
+    private final UserEntity assigned = UserEntity.builder()
             .id(2L)
             .email("assigned@example.com")
             .build();
 
-    TaskDto taskDto = TaskDto.builder()
+    private final TaskDto taskDto = TaskDto.builder()
             .id(1L)
             .header("test header")
             .description("test")
@@ -42,18 +41,7 @@ class TaskServiceTest {
             .assigned(assigned.getEmail())
             .build();
 
-    TaskDto taskDto2 = TaskDto.builder()
-            .id(2L)
-            .header("test header 2")
-            .description("test 2")
-            .status(TaskStatus.IN_PROGRESS)
-            .priority(TaskPriority.MEDIUM)
-            .creator(creator.getEmail())
-            .assigned(assigned.getEmail())
-            .build();
-
-
-    TaskDto taskDtoUpdated = TaskDto.builder()
+    private final TaskDto taskDtoUpdated = TaskDto.builder()
             .id(taskDto.getId())
             .header("test complete")
             .description("complete")
@@ -63,7 +51,7 @@ class TaskServiceTest {
             .assigned(creator.getEmail())
             .build();
 
-    TaskDto taskDtoWrongCreator = TaskDto.builder()
+    private final TaskDto taskDtoWrongCreator = TaskDto.builder()
             .id(taskDto.getId())
             .header("test complete")
             .description("complete")
@@ -73,6 +61,25 @@ class TaskServiceTest {
             .assigned(creator.getEmail())
             .build();
 
+    private final TaskDto taskDto2 = TaskDto.builder()
+            .id(2L)
+            .header("test header 2")
+            .description("test 2")
+            .status(TaskStatus.IN_PROGRESS)
+            .priority(TaskPriority.MEDIUM)
+            .creator(creator.getEmail())
+            .assigned(assigned.getEmail())
+            .build();
+
+    private final TaskDto taskDtoSecondCreator = TaskDto.builder()
+            .id(2L)
+            .header("test header 2")
+            .description("test 2")
+            .status(TaskStatus.IN_PROGRESS)
+            .priority(TaskPriority.MEDIUM)
+            .creator(creator.getEmail() + "2")
+            .assigned(assigned.getEmail() + "2")
+            .build();
 
     @Test
     void getAllTasks() {
@@ -89,23 +96,6 @@ class TaskServiceTest {
         Assertions.assertEquals(taskDto, taskService.getTaskById(1L));
     }
 
-    @Test
-    void getTasksByCreator() {
-        Assertions.assertTrue(taskService.getAllTasks().isEmpty());
-        taskService.createTask(taskDto);
-        List<TaskDto> tasksByCreator = taskService.getTasksByCreator(creator.getEmail());
-        Assertions.assertEquals(1, tasksByCreator.size());
-        Assertions.assertEquals(taskDto, taskService.getTasksByCreator(creator.getEmail()).get(0));
-    }
-
-    @Test
-    void getTasksByAssigned() {
-        Assertions.assertTrue(taskService.getAllTasks().isEmpty());
-        taskService.createTask(taskDto);
-        List<TaskDto> tasksByCreator = taskService.getTasksByAssigned(assigned.getEmail());
-        Assertions.assertEquals(1, tasksByCreator.size());
-        Assertions.assertEquals(taskDto, taskService.getTasksByAssigned(assigned.getEmail()).get(0));
-    }
 
     @Test
     void updateTask() {
@@ -168,4 +158,55 @@ class TaskServiceTest {
                 taskService.deleteTask(taskDtoWrongCreator.getId(), taskDtoWrongCreator.getCreator()));
         Assertions.assertEquals(1, taskService.getAllTasks().size());
     }
+
+    @Test
+    void findByCreatorOrAssigned() {
+        TaskDto task = TaskDto.builder()
+                .id(10L)
+                .header("test header")
+                .description("test")
+                .status(TaskStatus.IN_PROGRESS)
+                .priority(TaskPriority.MEDIUM)
+                .creator(creator.getEmail())
+                .assigned(assigned.getEmail())
+                .build();
+
+        Assertions.assertEquals(0, taskService.getAllTasks().size());
+        taskService.createTask(task);
+        Assertions.assertEquals(1, taskService.getAllTasks().size());
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // correct
+        Assertions.assertEquals(1, taskService.getAllTasks(null, null, pageable).size());
+        Assertions.assertEquals(1, taskService.getAllTasks(task.getCreator(), null, pageable).size());
+        Assertions.assertEquals(1, taskService.getAllTasks(null, task.getAssigned(), pageable).size());
+        Assertions.assertEquals(1, taskService.getAllTasks(task.getCreator(), task.getAssigned(), pageable).size());
+
+        // wrong
+        Assertions.assertEquals(0, taskService.getAllTasks( task.getAssigned(), null, pageable).size());
+        Assertions.assertEquals(0, taskService.getAllTasks( null, task.getCreator(), pageable).size());
+        Assertions.assertEquals(0, taskService.getAllTasks( task.getAssigned(), task.getCreator(), pageable).size());
+    }
+
+    @Test
+    void findByCreatorOrAssigned2() {
+
+        Assertions.assertEquals(0, taskService.getAllTasks().size());
+        taskService.createTask(taskDto);
+        taskService.createTask(taskDtoSecondCreator);
+        Assertions.assertEquals(2, taskService.getAllTasks().size());
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // correct
+        Assertions.assertEquals(2, taskService.getAllTasks(null, null, pageable).size());
+        Assertions.assertEquals(1, taskService.getAllTasks(taskDto.getCreator(), null, pageable).size());
+        Assertions.assertEquals(1, taskService.getAllTasks(null, taskDto.getAssigned(), pageable).size());
+        Assertions.assertEquals(1, taskService.getAllTasks(taskDto.getCreator(), taskDto.getAssigned(), pageable).size());
+
+        // wrong
+        Assertions.assertEquals(0, taskService.getAllTasks( taskDto.getAssigned(), null, pageable).size());
+        Assertions.assertEquals(0, taskService.getAllTasks( null, taskDto.getCreator(), pageable).size());
+        Assertions.assertEquals(0, taskService.getAllTasks( taskDto.getAssigned(), taskDto.getCreator(), pageable).size());
+    }
+
 }
