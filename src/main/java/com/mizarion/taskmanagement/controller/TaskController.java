@@ -33,7 +33,7 @@ public class TaskController {
     @GetMapping()
     public ResponseEntity<List<TaskDto>> getTasks(@RequestParam(required = false)  String creator,
                                                   @RequestParam(required = false)  String assigned,
-                                                  @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                                  @PageableDefault(sort = "id") Pageable pageable) {
         return ResponseEntity.ok(taskService.getAllTasks(creator, assigned,pageable));
     }
 

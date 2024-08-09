@@ -6,6 +6,8 @@ import com.mizarion.taskmanagement.TaskStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Setter
 @Getter
@@ -38,4 +40,7 @@ public class TaskEntity {
     @Column(name = "assigned")
     private String assigned;
 
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<CommentEntity> comments;
 }

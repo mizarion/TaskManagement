@@ -1,45 +1,23 @@
 package com.mizarion.taskmanagement.service;
 
+import com.mizarion.taskmanagement.AbstractTaskManagementApplicationTests;
 import com.mizarion.taskmanagement.TaskPriority;
 import com.mizarion.taskmanagement.TaskStatus;
 import com.mizarion.taskmanagement.dto.TaskDto;
-import com.mizarion.taskmanagement.entity.UserEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class TaskServiceTest {
+
+class TaskServiceTest extends AbstractTaskManagementApplicationTests {
 
     @Autowired
     private TaskService taskService;
 
-    private final UserEntity creator = UserEntity.builder()
-            .id(1L)
-            .email("creator@example.com")
-            .build();
-
-    private final UserEntity assigned = UserEntity.builder()
-            .id(2L)
-            .email("assigned@example.com")
-            .build();
-
-    private final TaskDto taskDto = TaskDto.builder()
-            .id(1L)
-            .header("test header")
-            .description("test")
-            .status(TaskStatus.IN_PROGRESS)
-            .priority(TaskPriority.MEDIUM)
-            .creator(creator.getEmail())
-            .assigned(assigned.getEmail())
-            .build();
 
     private final TaskDto taskDtoUpdated = TaskDto.builder()
             .id(taskDto.getId())
