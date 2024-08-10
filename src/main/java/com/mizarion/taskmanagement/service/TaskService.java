@@ -1,6 +1,9 @@
 package com.mizarion.taskmanagement.service;
 
-import com.mizarion.taskmanagement.dto.TaskDto;
+import com.mizarion.taskmanagement.dto.tasks.CreateTaskRequestDto;
+import com.mizarion.taskmanagement.dto.tasks.TaskDto;
+import com.mizarion.taskmanagement.entity.UserEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -11,11 +14,12 @@ public interface TaskService {
 
     List<TaskDto> getAllTasks();
 
-    List<TaskDto> getAllTasks(String creator, String assigned, Pageable pageable);
+    Page<TaskDto> getAllTasks(String creator, String assigned, Pageable pageable);
 
-    TaskDto createTask(TaskDto task);
+    TaskDto createTask(CreateTaskRequestDto task, UserEntity user);
 
-    TaskDto updateTask(TaskDto task);
+    TaskDto updateTask(TaskDto task, UserEntity user);
 
-    void deleteTask(Long id, String creator);
+    void deleteTask(Long id, String currentUser);
+
 }

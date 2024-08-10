@@ -12,9 +12,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TaskRepository extends JpaRepository<TaskEntity, Long>, JpaSpecificationExecutor<TaskEntity> {
 
-    @Query("SELECT t FROM TaskEntity t " +
-           "WHERE (:creator IS NULL OR t.creator = :creator) " +
-           "AND (:assigned IS NULL OR t.assigned = :assigned)")
+    @Query("SELECT t FROM TaskEntity AS t " +
+           "WHERE (:creator IS NULL OR t.creator.email = :creator) " +
+           "AND (:assigned IS NULL  OR t.assigned.email = :assigned)")
     Page<TaskEntity> findByCreatorAndAssigned(@Param("creator") String creator,
                                               @Param("assigned") String assigned,
                                               Pageable pageable);

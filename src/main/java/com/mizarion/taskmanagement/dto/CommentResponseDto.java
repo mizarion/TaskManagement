@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentDto {
+public class CommentResponseDto {
 
     @JsonProperty("id")
     private Long id;

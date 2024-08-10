@@ -3,6 +3,7 @@ package com.mizarion.taskmanagement.controller;
 import com.mizarion.taskmanagement.dto.AuthRequest;
 import com.mizarion.taskmanagement.dto.AuthResponse;
 import com.mizarion.taskmanagement.dto.RegisterRequest;
+import com.mizarion.taskmanagement.dto.UserDto;
 import com.mizarion.taskmanagement.security.jwt.JWTGenerator;
 import com.mizarion.taskmanagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,10 +55,9 @@ public class AuthController {
 
     @PostMapping("register")
     @Operation(summary = "Register new user")
-    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest registerDto) {
+    public ResponseEntity<UserDto> register(@Valid @RequestBody RegisterRequest registerDto) {
         registerDto.setPassword(passwordEncoder.encode((registerDto.getPassword())));
-        userService.register(registerDto);
-        return ResponseEntity.ok("register user " + registerDto.getEmail());
+        return ResponseEntity.ok(userService.register(registerDto));
     }
 
 }

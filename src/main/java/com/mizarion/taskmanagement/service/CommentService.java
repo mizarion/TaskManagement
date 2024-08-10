@@ -1,13 +1,13 @@
 package com.mizarion.taskmanagement.service;
 
-import com.mizarion.taskmanagement.dto.CommentDto;
+import com.mizarion.taskmanagement.dto.CommentResponseDto;
 import com.mizarion.taskmanagement.entity.UserEntity;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CommentService {
 
-    CommentDto addComment(Long taskId, String content, UserEntity currentUser);
+    CommentResponseDto addComment(Long taskId, String content, UserEntity currentUser);
 
-    List<CommentDto> getCommentsByTask(Long taskId);
+    Page<CommentResponseDto> getCommentsByTask(Long taskIdm, Pageable pageable);
 }

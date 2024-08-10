@@ -12,19 +12,32 @@ class CommentServiceImplTest extends AbstractTaskManagementApplicationTests {
 
     @Test
     void addComment() {
-        taskService.createTask(taskDto);
-        Assertions.assertEquals(0, commentService.getCommentsByTask(taskDto.getId()).size());
+        taskService.createTask(CreateTaskDTO, creator);
+        Assertions.assertEquals(0, commentService.getCommentsByTask(taskDto.getId(), PAGEABLE).getContent().size());
         commentService.addComment(taskDto.getId(), "addComment", creator);
-        Assertions.assertEquals(1, commentService.getCommentsByTask(taskDto.getId()).size());
+        Assertions.assertEquals(1, commentService.getCommentsByTask(taskDto.getId(), PAGEABLE).getContent().size());
     }
 
     @Test
     void tryToAddCommentToNonExistedTask() {
         Assertions.assertThrows(Exception.class,
-                () -> Assertions.assertEquals(0, commentService.getCommentsByTask(taskDto.getId()).size()));
+                () -> commentService.getCommentsByTask(taskDto.getId(), PAGEABLE).getContent().size());
         Assertions.assertThrows(Exception.class,
                 () -> commentService.addComment( taskDto.getId(), "tryToAddCommentToNonExistedTask", creator));
         Assertions.assertThrows(Exception.class,
-                () -> Assertions.assertEquals(0, commentService.getCommentsByTask(taskDto.getId()).size()));
+                () -> commentService.getCommentsByTask(taskDto.getId(), PAGEABLE).getContent().size());
     }
+
+    @Test
+    void deleteCommentsWithTask() {
+        taskService.createTask(CreateTaskDTO, creator);
+        Assertions.assertEquals(0, commentService.getCommentsByTask(taskDto.getId(), PAGEABLE).getContent().size());
+        commentService.addComment(taskDto.getId(), "addComment", creator);
+        Assertions.assertEquals(1, commentService.getCommentsByTask(taskDto.getId(), PAGEABLE).getContent().size());
+
+        taskService.deleteTask(taskDto.getId(), taskDto.getCreator());
+        Assertions.assertThrows(Exception.class,
+                () -> commentService.getCommentsByTask(taskDto.getId(), PAGEABLE).getContent().size());
+    }
+
 }

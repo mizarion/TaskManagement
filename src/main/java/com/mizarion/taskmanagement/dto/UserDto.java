@@ -13,13 +13,6 @@ public class UserDto {
 
     private String email;
 
-    private String password;
+//    private String password;
 
-    // date?
-
-    // list of created tasks
-
-    // list of assigned tasks
-
-    // list of comments?
 }

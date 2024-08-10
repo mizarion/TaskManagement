@@ -1,4 +1,4 @@
-package com.mizarion.taskmanagement;
+package com.mizarion.taskmanagement.entity;
 
 public enum TaskStatus {
     PENDING,

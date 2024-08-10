@@ -1,13 +1,16 @@
 package com.mizarion.taskmanagement.service;
 
-import com.mizarion.taskmanagement.dto.AuthRequest;
 import com.mizarion.taskmanagement.dto.RegisterRequest;
 import com.mizarion.taskmanagement.dto.UserDto;
 import com.mizarion.taskmanagement.entity.UserEntity;
 import com.mizarion.taskmanagement.exception.trowables.UserAlreadyExistException;
+import com.mizarion.taskmanagement.exception.trowables.WrongUserException;
 import com.mizarion.taskmanagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,19 +36,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto findByEmail(String email) {
-        return null;
+    public UserEntity findUserEntityByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new WrongUserException("Could not find user with email '" + email + "'"));
     }
 
     @Override
-    public String authenticate(AuthRequest authRequest) {
-        return null;
-    }
-
-    @Override
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream()
+    public Page<UserDto> getAllUsers(Pageable pageable) {
+        List<UserDto> list = userRepository.findAll(pageable).stream()
                 .map(e -> modelMapper.map(e, UserDto.class))
                 .toList();
+        return new PageImpl<>(list, pageable, list.size());
     }
 }
