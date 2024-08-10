@@ -122,7 +122,7 @@ http://localhost:8080/api/tasks/{taskid}
 http://localhost:8080/api/{taskid}/comments
 
 ```json
-...
+some text
 ```
 
 ### Get Comments for task id
