@@ -2,9 +2,13 @@ package com.mizarion.taskmanagement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Entity
@@ -15,6 +19,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
 public class UserEntity implements UserDetails {
 
     @Id
@@ -27,6 +32,12 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "password")
     private String password;
+
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

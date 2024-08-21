@@ -2,6 +2,7 @@ package com.mizarion.taskmanagement.service;
 
 import com.mizarion.taskmanagement.dto.tasks.CreateTaskRequestDto;
 import com.mizarion.taskmanagement.dto.tasks.TaskDto;
+import com.mizarion.taskmanagement.dto.tasks.UpdateTaskRequestDto;
 import com.mizarion.taskmanagement.entity.TaskEntity;
 import com.mizarion.taskmanagement.entity.UserEntity;
 import com.mizarion.taskmanagement.exception.trowables.TaskNotFoundException;
@@ -34,7 +35,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDto getTaskById(Long id) {
-        return modelMapper.map(taskRepository.findById(id).get(), TaskDto.class);
+        TaskEntity entity = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+        return modelMapper.map(entity, TaskDto.class);
     }
 
     @Override
@@ -56,11 +59,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDto updateTask(TaskDto updateTask, UserEntity user) {
+    public TaskDto updateTask(UpdateTaskRequestDto updateTask, UserEntity user) {
         TaskEntity existingTask = taskRepository.findById(updateTask.getId())
                 .orElseThrow(() -> new TaskNotFoundException(updateTask.getId()));
-        if (existingTask.getCreator().getEmail().equals(user.getUsername())
-            && updateTask.getCreator().equals(user.getUsername())) {
+        if (existingTask.getCreator().getEmail().equals(user.getUsername())) {
             existingTask.setHeader(updateTask.getHeader());
             existingTask.setDescription(updateTask.getDescription());
             existingTask.setStatus(updateTask.getStatus());

@@ -2,6 +2,11 @@ package com.mizarion.taskmanagement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -10,6 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "comments")
+@EntityListeners(AuditingEntityListener.class)
 public class CommentEntity {
 
     @Id
@@ -28,4 +34,9 @@ public class CommentEntity {
     @JoinColumn(name = "task_id", nullable = false)
     private TaskEntity task;
 
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 }

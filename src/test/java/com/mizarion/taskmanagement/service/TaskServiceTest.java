@@ -3,11 +3,13 @@ package com.mizarion.taskmanagement.service;
 import com.mizarion.taskmanagement.AbstractTaskManagementApplicationTests;
 import com.mizarion.taskmanagement.dto.tasks.CreateTaskRequestDto;
 import com.mizarion.taskmanagement.dto.tasks.TaskDto;
+import com.mizarion.taskmanagement.dto.tasks.UpdateTaskRequestDto;
 import com.mizarion.taskmanagement.entity.TaskPriority;
 import com.mizarion.taskmanagement.entity.TaskStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,9 @@ class TaskServiceTest extends AbstractTaskManagementApplicationTests {
 
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     private final TaskDto taskDtoWrongCreator = TaskDto.builder()
             .id(taskDto.getId())
@@ -64,15 +69,17 @@ class TaskServiceTest extends AbstractTaskManagementApplicationTests {
 
     @Test
     void updateTask() {
-        TaskDto taskDtoUpdated = TaskDto.builder()
+        UpdateTaskRequestDto taskDtoUpdated = UpdateTaskRequestDto.builder()
                 .id(taskDto.getId())
                 .header("test complete")
                 .description("complete")
                 .status(TaskStatus.COMPLETED)
                 .priority(TaskPriority.HIGH)
-                .creator(creator.getEmail())
                 .assigned(assigned.getEmail())
                 .build();
+
+        TaskDto updatedDto = modelMapper.map(taskDtoUpdated, TaskDto.class);
+        updatedDto.setCreator(creator.getEmail());
 
         taskService.createTask(CreateTaskDTO, creator);
         Assertions.assertEquals(1, taskService.getAllTasks().size());
@@ -82,18 +89,30 @@ class TaskServiceTest extends AbstractTaskManagementApplicationTests {
         List<TaskDto> allTasks = taskService.getAllTasks();
         Assertions.assertEquals(1, allTasks.size());
         Assertions.assertNotEquals(taskDto, allTasks.get(0));
-        Assertions.assertEquals(taskDtoUpdated, allTasks.get(0));
+        Assertions.assertEquals(updatedDto, allTasks.get(0));
     }
 
     @Test
     void updateWTaskAndChangeOwnerShipAndAssigned() {
+        UpdateTaskRequestDto taskDtoWrongCreator = UpdateTaskRequestDto.builder()
+                .id(taskDto.getId())
+                .header("test complete")
+                .description("complete")
+                .status(TaskStatus.COMPLETED)
+                .priority(TaskPriority.HIGH)
+                .assigned(assigned2.getEmail())
+                .build();
+
         taskService.createTask(CreateTaskDTO, creator);
         Assertions.assertEquals(1, taskService.getAllTasks().size());
-        Assertions.assertThrows(Exception.class, () -> taskService.updateTask(taskDtoWrongCreator, creator));
+        Assertions.assertThrows(Exception.class, () -> taskService.updateTask(taskDtoWrongCreator, creator2));
         List<TaskDto> allTasks = taskService.getAllTasks();
 
         Assertions.assertEquals(1, allTasks.size());
         Assertions.assertEquals(taskDto, allTasks.get(0));
+
+        TaskDto updatedDto = modelMapper.map(taskDtoWrongCreator, TaskDto.class);
+        updatedDto.setCreator(creator2.getEmail());
         Assertions.assertNotEquals(taskDtoWrongCreator, allTasks.get(0));
     }
 

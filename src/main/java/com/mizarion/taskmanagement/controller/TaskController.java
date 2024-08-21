@@ -2,6 +2,7 @@ package com.mizarion.taskmanagement.controller;
 
 import com.mizarion.taskmanagement.dto.tasks.CreateTaskRequestDto;
 import com.mizarion.taskmanagement.dto.tasks.TaskDto;
+import com.mizarion.taskmanagement.dto.tasks.UpdateTaskRequestDto;
 import com.mizarion.taskmanagement.entity.UserEntity;
 import com.mizarion.taskmanagement.service.TaskService;
 import jakarta.validation.Valid;
@@ -26,8 +27,7 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<TaskDto> createTask(@RequestBody @Valid CreateTaskRequestDto taskDto,
                                               @AuthenticationPrincipal UserEntity currentUser) {
-        TaskDto task = taskService.createTask(taskDto, currentUser);
-        return ResponseEntity.ok(task);
+        return ResponseEntity.ok(taskService.createTask(taskDto, currentUser));
     }
 
     @GetMapping()
@@ -37,9 +37,14 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getAllTasks(creator, assigned, pageable));
     }
 
+    @GetMapping("/{taskId}")
+    public ResponseEntity<TaskDto> getTaskById(@PathVariable @Positive Long taskId) {
+        return ResponseEntity.ok(taskService.getTaskById(taskId));
+    }
+
     @PutMapping("/{taskId}")
     public ResponseEntity<TaskDto> updateTask(@PathVariable @Positive Long taskId,
-                                              @RequestBody @Valid TaskDto taskDto,
+                                              @RequestBody @Valid UpdateTaskRequestDto taskDto,
                                               @AuthenticationPrincipal UserEntity currentUser) {
         taskDto.setId(taskId);
         TaskDto updated = taskService.updateTask(taskDto, currentUser);
