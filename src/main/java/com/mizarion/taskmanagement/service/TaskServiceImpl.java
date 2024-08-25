@@ -70,7 +70,8 @@ public class TaskServiceImpl implements TaskService {
             if (updateTask.getAssigned() != null && !updateTask.getAssigned().isBlank()) {
                 existingTask.setAssigned(userService.findUserEntityByEmail(updateTask.getAssigned()));
             }
-        } else if (existingTask.getAssigned().getEmail().equals(user.getUsername())) {
+        } else if (existingTask.getAssigned() != null
+                   && existingTask.getAssigned().getEmail().equals(user.getUsername())) {
             existingTask.setStatus(updateTask.getStatus());
         } else {
             throw new WrongUserException("you are neither the creator nor the assigned");

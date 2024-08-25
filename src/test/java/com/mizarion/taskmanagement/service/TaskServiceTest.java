@@ -93,6 +93,44 @@ class TaskServiceTest extends AbstractTaskManagementApplicationTests {
     }
 
     @Test
+    void updateUnassignedTaskByAssignee() {
+        CreateTaskRequestDto CreateTaskDTO = CreateTaskRequestDto.builder()
+//            .id(1L)
+                .header(taskDto.getHeader())
+                .description(taskDto.getDescription())
+                .status(TaskStatus.IN_PROGRESS)
+                .priority(TaskPriority.MEDIUM)
+//            .creator(creator)
+//                .assigned(taskDto.getAssigned())
+                .build();
+
+        taskService.createTask(CreateTaskDTO, creator);
+
+        UpdateTaskRequestDto taskDtoUpdated = UpdateTaskRequestDto.builder()
+                .id(taskDto.getId())
+                .header("test complete")
+                .description("complete")
+                .status(TaskStatus.COMPLETED)
+                .priority(TaskPriority.HIGH)
+//                .assigned(assigned.getEmail())
+                .build();
+
+        Assertions.assertThrows(Exception.class, () ->  taskService.updateTask(taskDtoUpdated, assigned));
+
+        TaskDto createDto = modelMapper.map(CreateTaskDTO, TaskDto.class);
+        createDto.setCreator(creator.getEmail());
+        createDto.setId(1L);
+        TaskDto updatedDto = modelMapper.map(taskDtoUpdated, TaskDto.class);
+        updatedDto.setCreator(creator.getEmail());
+        updatedDto.setId(1L);
+
+        List<TaskDto> allTasks = taskService.getAllTasks();
+        Assertions.assertEquals(1, allTasks.size());
+        Assertions.assertEquals(createDto, allTasks.get(0));
+        Assertions.assertNotEquals(updatedDto, allTasks.get(0));
+    }
+
+    @Test
     void updateWTaskAndChangeOwnerShipAndAssigned() {
         UpdateTaskRequestDto taskDtoWrongCreator = UpdateTaskRequestDto.builder()
                 .id(taskDto.getId())
@@ -113,7 +151,7 @@ class TaskServiceTest extends AbstractTaskManagementApplicationTests {
 
         TaskDto updatedDto = modelMapper.map(taskDtoWrongCreator, TaskDto.class);
         updatedDto.setCreator(creator2.getEmail());
-        Assertions.assertNotEquals(taskDtoWrongCreator, allTasks.get(0));
+        Assertions.assertNotEquals(updatedDto, allTasks.get(0));
     }
 
     @Test
